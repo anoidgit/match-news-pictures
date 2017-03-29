@@ -124,6 +124,7 @@ function train()
 
 	mindeverrate=evaDev(nnmod,critmod)
 	print("Init model Dev:"..mindeverrate)
+	mindeverrate=math.huge--this line was wired, to force forget the init state, added by ano
 
 	local pt = torch.CudaTensor(1):fill(1)
 	local nt = torch.CudaTensor(1):fill(-1)
