@@ -16,6 +16,7 @@ function gradUpdate(mlpin, x, py, ny, criterionin, lr, optm, bsize, nsm)
 	if bsize>1 then
 		local negsample=nsm:forward(pred)
 		local _negloss=criterionin:forward(negsample, ny)
+		_inner_err=_inner_err+_negloss
 		local _ngradCriterion=criterionin:backward(negsample, ny)
 		local _gradneg=nsm:backward(pred,_ngradCriterion)
 		gradCriterion[1]:add(_gradneg[1])
