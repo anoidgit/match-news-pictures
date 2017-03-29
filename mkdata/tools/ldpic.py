@@ -3,6 +3,7 @@
 import sys
 import h5py
 import cv2
+import numpy
 
 import os
 
@@ -33,7 +34,7 @@ def handle(src,rsf,srcp):
 	for pu in pl:
 		tmp,flag=ldpic(srcp+pu)
 		if flag:
-			h5f[str(curid)]=tmp
+			h5f[str(curid)]=numpy.moveaxis(tmp,-1,0)
 			curid+=1
 		else:
 			fl.append(pu)

@@ -94,9 +94,9 @@ def wrtrs(rsl,fname):
 #src:源文件，按长度降序排列
 #rs:切分配置文件
 def handle(src,rs):
-	maxbatch=80#最大批量大小
+	maxbatch=64#最大批量大小
 	maxind=maxbatch*1000#最大词索引数量
-	maxpad=60/8#最大填充长度
+	maxpad=64/8#最大填充长度
 	wrtrs(splitter(ldsrc(src,100000),maxbatch,maxind,maxpad),rs)
 
 if __name__=="__main__":
