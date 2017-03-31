@@ -1,7 +1,7 @@
 function buildseqv(inivec,featsize,pdrop)
 	local seqv=nn.Sequential()
 		:add(nn.vecLookup(inivec))
-		:add(nn.Sum(2,3,true))
+		:add(nn.Sum(1,3,true))
 		:add(nn.Dropout(pdrop or 0.5,nil,true))
 		--:add(nn.Tanh())
 		:add(nn.ELU(nil,true))

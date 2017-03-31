@@ -9,13 +9,15 @@ end
 function weightSum:updateOutput(input)
 	local seqv, w = unpack(input)
 	local stdv = seqv[1]
-	if self.output:isSize(stdv) then
+	if self.output:isSize(stdv:size()) then
 		self.output:zero()
 	else
 		self.output:resizeAs(stdv):zero()
 	end
+	local bsize = w:size(2)
+	local esize = stdv:size()
 	for i = 1, seqv:size(1) do
-		self.output:addcmul(w[i], seqv[i])
+		self.output:addcmul(w[i]:reshape(bsize,1):expand(esize), seqv[i])
 	end
 	self.wsum = w:sum()
 	self.output:div(self.wsum)
@@ -25,16 +27,18 @@ end
 function weightSum:updateGradInput(input, gradOutput)
 	gradOutput:div(self.wsum)
 	local seqv, w = unpack(input)
-	if ~self.gradSeq:isSize(seqv) then
-		self.gradSeq:resizeAs(seqv):zero()
-		self.gradW:resizeAs(w):zero()
+	if not self.gradSeq:isSize(seqv:size()) then
+		self.gradSeq:resizeAs(seqv)
+		self.gradW:resizeAs(w)
 	end
+	local bsize = w:size(2)
+	local esize = gradOutput:size()
 	for i = 1, seqv:size(1) do
-		local _curGrad = gradOutput[i]
-		self.gradSeq[i]:mul(_curGrad, w[i])
-		self.gradW[i] = torch.cmul(_curGrad, seqv[i]):sum()
+		self.gradSeq[i]:cmul(gradOutput, w[i]:reshape(bsize,1):expand(esize))
+		self.gradW[i] = torch.cmul(gradOutput, seqv[i]):sum()
 	end
 	self.gradInput = {self.gradSeq, self.gradW}
+	return self.gradInput
 end
 
 function weightSum:clearState()

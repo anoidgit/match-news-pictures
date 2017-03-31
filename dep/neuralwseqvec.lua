@@ -1,17 +1,31 @@
+require "nngraph"
+
 function buildseqv(inivec,featsize,pdrop,hsize)
-	local hidsize = hsize or 2
+	local input = nn.vecLookup(inivec)()
+	local weight = nn.reWShape()(nn.Bottle(nn.Linear(inivec:size(2), 1, false))(input))
+	local output = nn.Linear(inivec:size(2),featsize)(nn.ELU(nil,true)(nn.Dropout(pdrop or 0.5,nil,true)(nn.weightSum()({input, weight}))))
+	return nn.gModule({input}, {output})
+end
+
+--[[function buildseqv(inivec,featsize,pdrop,hsize)
+	--local hidsize = hsize or 2
 	local seqv=nn.Sequential()
+		:add(nn.vecLookup(inivec))
 		:add(nn.ConcatTable()
-			:add(nn.vecLookup(inivec))
+			:add(nn.Identity())
 			:add(nn.Sequential()
-				-- or just a nn.Bottle(nn.Linear(inivec:size(2), 1))
-				:add(cudnn.BGRU(inivec:size(2), hidsize , 1))
-				:add(nn.Linear(2*hidsize, 1))
-				:add(nn.Sigmoid())))
+				--:add(nn.Dropout(pdrop or 0.5))
+				-- use linear or gru? gru need much more memory
+				:add(nn.Bottle(nn.Linear(inivec:size(2), 1, false)))
+				--:add(cudnn.GRU(inivec:size(2), hidsize , 1))
+				--:add(nn.Bottle(nn.Linear(hidsize, 1)))
+				:add(nn.reWShape())
+				--:add(nn.Sigmoid())
+				))
 		:add(nn.weightSum())
 		:add(nn.Dropout(pdrop or 0.5,nil,true))
 		--:add(nn.Tanh())
 		:add(nn.ELU(nil,true))
 		:add(nn.Linear(inivec:size(2),featsize))
 	return seqv
-end
+end]]
