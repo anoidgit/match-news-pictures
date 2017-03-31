@@ -1,4 +1,4 @@
-function buildalex(featsize)
+function buildpicv(featsize)
 	local SpatialConvolution = cudnn.SpatialConvolution
 	local SpatialMaxPooling = cudnn.SpatialMaxPooling
 

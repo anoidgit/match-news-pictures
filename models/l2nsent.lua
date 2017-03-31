@@ -1,5 +1,7 @@
 require "dep.seqvec"
 --require "dep.wseqvec"
+--require "dep.neuralwseqvec"
+
 require "dep.alex"
 --require "dep.vgg"
 
@@ -8,5 +10,5 @@ function getusenn(featsize)
 	wvec[nword]:zero()
 	return nn.ParallelTable()
 		:add(buildseqv(wvec,featsize))
-		:add(buildalex(featsize))
+		:add(buildpicv(featsize))
 end

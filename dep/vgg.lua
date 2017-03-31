@@ -1,4 +1,4 @@
-function buildvgg(featsize)
+function buildpicv(featsize)
 
 	local backend = cudnn
 
