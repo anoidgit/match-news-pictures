@@ -1,0 +1,12 @@
+function buildseqv(inivec,featsize,pdrop)
+	local seqv=nn.Sequential()
+		:add(nn.ParallelTable()
+			:add(nn.vecLookup(inivec))
+			:add(nn.Identity()))
+		:add(nn.weightSum())
+		:add(nn.Dropout(pdrop or 0.5,nil,true))
+		--:add(nn.Tanh())
+		:add(nn.ELU(nil,true))
+		:add(nn.Linear(inivec:size(2),featsize))
+	return seqv
+end

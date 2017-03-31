@@ -1,4 +1,5 @@
 require "dep.seqvec"
+--require "dep.wseqvec"
 require "dep.alex"
 --require "dep.vgg"
 
