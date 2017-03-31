@@ -1,10 +1,11 @@
---require "dep.seqvec"
+require "dep.seqvec"
 
-require "dep.weightSum"--this was needed by weight seqvec model
-require "dep.reWShape"--this was needed by neural weight seqvec model
+--require "dep.weightSum"--this was needed by weight seqvec model
+--require "dep.reWShape"--this was needed by neural weight seqvec model
 --require "dep.wseqvec"
-require "dep.neuralwseqvec"
+--require "dep.neuralwseqvec"
 
+require "dep.stdalex"
 require "dep.alex"
 --require "dep.vgg"
 

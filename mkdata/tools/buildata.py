@@ -38,7 +38,7 @@ def handle(srcpf,rspf,srctf,rstf,splf,padv):
 					for i in xrange(tmp):
 						lind=frd.readline().strip().decode("utf-8").split(" ")
 						td.append([int(linu) for linu in lind])
-					td=numpy.array(padmat(td,padv),dtype=long)
+					td=numpy.array(padmat(td,padv),dtype=long).T
 					rtf[wrtkey]=td
 					cuwid+=1
 	rpf.close()
