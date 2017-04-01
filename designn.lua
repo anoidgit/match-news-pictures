@@ -23,7 +23,7 @@ end
 function getnnn()
 
 	require "models.l2nsent"
-	return getusenn(512)
+	return getusenn(256)
 
 end
 

@@ -17,10 +17,10 @@ function buildpicv(featsize)
 		:add(SpatialMaxPooling(3,3,2,2))						 -- 13 -> 6
 
 		:add(nn.View(256*6*6))
+		:add(nn.Dropout(0.5,nil,true))
 
 		:add(nn.ELU(nil,true))
 
-		:add(nn.Dropout(0.5))
 		:add(nn.Linear(256*6*6, featsize))
 		:add(nn.keepBatch())
 

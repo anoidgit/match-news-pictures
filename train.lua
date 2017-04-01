@@ -202,6 +202,7 @@ function train()
 			if edevrate<mindeverrate then
 				mindeverrate=edevrate
 				amindeverr=1
+				aminerr=1--reset aminerr at the same time
 				savennmod:clearState()
 				saveObject(savedir.."devnnmod"..storedevmini..".asc",savennmod)
 				storedevmini=storedevmini+1

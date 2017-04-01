@@ -5,7 +5,7 @@ require "dep.seqvec"
 --require "dep.wseqvec"
 --require "dep.neuralwseqvec"
 
-require "dep.stdalex"
+--require "dep.stdalex"
 require "dep.alex"
 --require "dep.vgg"
 
