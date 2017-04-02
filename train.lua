@@ -174,7 +174,7 @@ function train()
 
 	if warmcycle>0 then
 		logger:log("save neural network trained")
-		savennmod:clearState()
+		--savennmod:clearState()
 		saveObject(savedir.."nnmod.asc",savennmod)
 	end
 
@@ -217,7 +217,7 @@ function train()
 				mindeverrate=edevrate
 				amindeverr=1
 				aminerr=1--reset aminerr at the same time
-				savennmod:clearState()
+				--savennmod:clearState()
 				saveObject(savedir.."devnnmod"..storedevmini..".asc",savennmod)
 				storedevmini=storedevmini+1
 				if storedevmini>csave then
@@ -237,7 +237,7 @@ function train()
 				minerrate=erate
 				aminerr=1
 				if not modsavd then
-					savennmod:clearState()
+					--savennmod:clearState()
 					saveObject(savedir.."nnmod"..storemini..".asc",savennmod)
 					storemini=storemini+1
 					if storemini>csave then
@@ -262,7 +262,7 @@ function train()
 		end
 
 		logger:log("save neural network trained")
-		savennmod:clearState()
+		--savennmod:clearState()
 		saveObject(savedir.."nnmod.asc",savennmod)
 
 		logger:log("save criterion history trained")
