@@ -9,7 +9,7 @@ function GlobalSum:updateOutput(input)
 	local seql = osize[1]
 	osize[1] = 1
 	self.output:resize(osize)
-	torch.sum(self.output, input, 1)
+	self.output:sum(input, 1)
 	self.output:div(seql)
 	self.output = self.output:expandAs(input)
 	return self.output
@@ -20,7 +20,7 @@ function GlobalSum:updateGradInput(input, gradOutput)
 	local seql = isize[1]
 	isize[1] = 1
 	self.gradInput:resize(isize)
-	torch.sum(self.gradInput, gradOutput, 1)
+	self.gradInput:sum(gradOutput, 1)
 	self.gradInput = self.gradInput:div(seql):expandAs(input)
 	return self.gradInput
 end

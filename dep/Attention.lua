@@ -15,7 +15,7 @@ function Attention:updateOutput(input)
 	local isize = input:size()
 	local seql = isize[1]
 	local bsize = isize[2]
-	local usize = input[1]:size()
+	local vsize = isize[3]
 	if self.output:isSize(isize) then
 		self.output:zero()
 	else
@@ -23,19 +23,11 @@ function Attention:updateOutput(input)
 		self.w:resize(seql, seql, bsize)
 	end
 	for i = 1, seql do
-		local center = input[i]
-		local curw = self.w[i]
-		for j = 1, seql do
-			torch.sum(curw[j], torch.cmul(center, input[j]), 2)
-		end
+		self.w[i]:sum(torch.cmul(input[i]:reshape(1, bsize, vsize):expand(isize), input), 3)
 	end
 	self.normw = self.module:updateOutput(self.w)
 	for i = 1, seql do
-		local curo = self.output[i]
-		local curw = self.normw[i]
-		for j = 1, seql do
-			curo:addcmul(curw[j]:reshape(bsize, 1):expand(usize), input[j])
-		end
+		self.output[i]:sum(torch.cmul(self.normw[i]:reshape(seql, bsize, 1):expand(isize), input), 1)
 	end
 	return self.output
 end
@@ -44,7 +36,7 @@ function Attention:updateGradInput(input, gradOutput)
 	local isize = input:size()
 	local seql = isize[1]
 	local bsize = isize[2]
-	local usize = input[1]:size()
+	local vsize = isize[3]
 	if self.gradInput:isSize(isize) then
 		self.gradInput:zero()
 		self.gradNormW:zero()
@@ -53,24 +45,15 @@ function Attention:updateGradInput(input, gradOutput)
 		self.gradNormW:resize(seql, seql, bsize):zero()
 	end
 	for i = 1, seql do
-		local curg = gradOutput[i]
-		local curw = self.normw[i]
-		local curgw = self.gradNormW[i]
-		for j = 1, seql do
-			self.gradInput[j]:addcmul(curg, curw[j]:reshape(bsize, 1):expand(usize))
-			torch.sum(curgw[j], torch.cmul(curg, input[j]), 2)
-		end
+		local curg = gradOutput[i]:reshape(1, bsize, vsize):expand(isize)
+		self.gradInput:addcmul(curg, self.normw[i]:reshape(seql, bsize, 1):expand(isize))
+		self.gradNormW[i]:sum(torch.cmul(curg, input), 3)
 	end
 	local gradW = self.module:updateGradInput(self.w, self.gradNormW)
 	for i = 1, seql do
-		local curgw = gradW[i]
-		local center = input[i]
-		local centerg = self.gradInput[i]
-		for j = 1, seql do
-			local curg = curgw[j]:reshape(bsize, 1):expand(usize)
-			self.gradInput[j]:addcmul(curg, center)
-			centerg:addcmul(curg, input[j])
-		end
+		local curgw = gradW[i]:reshape(seql, bsize, 1):expand(isize)
+		self.gradInput:addcmul(curgw, input[i]:reshape(1, bsize, vsize):expand(isize))
+		self.gradInput[i]:sum(torch.cmul(curgw, input), 1)
 	end
 	return self.gradInput
 end

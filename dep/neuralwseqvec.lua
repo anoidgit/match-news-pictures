@@ -8,7 +8,7 @@ require "dep.Attention"
 
 require "nngraph"
 
-function buildseqv(inivec,featsize,pdrop,hsize)
+function buildseqv(inivec,featsize,pdrop)
 	local input = nn.vecLookup(inivec)()
 	--local weight = nn.reWShape()(nn.Bottle(nn.Linear(inivec:size(2), 1, false))(input))
 	local weight = nn.reWShape()(nn.Bottle(nn.Linear(inivec:size(2) * 2, 1, false))(nn.JoinTable(3)({input, nn.Attention()(input)})))
@@ -17,8 +17,7 @@ function buildseqv(inivec,featsize,pdrop,hsize)
 	return nn.gModule({input}, {output})
 end
 
---[[function buildseqv(inivec,featsize,pdrop,hsize)
-	--local hidsize = hsize or 2
+--[[function buildseqv(inivec,featsize,pdrop)
 	local seqv=nn.Sequential()
 		:add(nn.vecLookup(inivec))
 		:add(nn.ConcatTable()
