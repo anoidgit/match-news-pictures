@@ -1,11 +1,18 @@
 print("set default tensor type to float")
 torch.setdefaulttensortype('torch.FloatTensor')
 
+function checkgpu(limit)
+	local fmem, totalmem = cutorch.getMemoryUsage()
+	if fmem/totalmem < limit then
+		collectgarbage()
+	end
+end
+
 function feval()
 	return _inner_err, _inner_gradParams
 end
 
-function gradUpdate(mlpin, x, py, ny, criterionin, lr, optm, bsize, nsm)
+function gradUpdate(mlpin, x, py, ny, criterionin, lr, optm, bsize, nsm, limit)
 
 	_inner_gradParams:zero()
 
@@ -25,6 +32,7 @@ function gradUpdate(mlpin, x, py, ny, criterionin, lr, optm, bsize, nsm)
 	pred=nil
 	mlpin:backward(x, gradCriterion)
 
+	checkgpu(limit)
 	optm(feval, _inner_params, {learningRate = lr})
 
 	--mlpin:maxParamNorm(2)
@@ -92,6 +100,8 @@ function train()
 	local savedir="modrs/"..runid.."/"
 	paths.mkdir(savedir)
 
+	local memlimit = recyclemem or 0.05
+
 	print("load optim")
 
 	require "getoptim"
@@ -146,7 +156,8 @@ function train()
 					nt:resize(bsize):fill(-1)
 					dsize=bsize
 				end
-				gradUpdate(nnmod,{it,ip},pt,nt,critmod,lr,optmethod,bsize,nsm)
+				gradUpdate(nnmod,{it,ip},pt,nt,critmod,lr,optmethod,bsize,nsm,memlimit)
+				xlua.progress(i, ntrain)
 			end
 		end
 		local erate=sumErr/eaddtrain
@@ -189,7 +200,8 @@ function train()
 						nt:resize(bsize):fill(-1)
 						dsize=bsize
 					end
-					gradUpdate(nnmod,{it,ip},pt,nt,critmod,lr,optmethod,bsize,nsm)
+					gradUpdate(nnmod,{it,ip},pt,nt,critmod,lr,optmethod,bsize,nsm,memlimit)
+					xlua.progress(i, ntrain)
 				end
 			end
 			local erate=sumErr/eaddtrain

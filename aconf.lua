@@ -14,3 +14,5 @@ earlystop=32
 csave=3
 
 lrdecaycycle=4
+
+recyclemem=0.05

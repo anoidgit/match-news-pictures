@@ -44,6 +44,6 @@ end
 function weightSum:clearState()
 	parent.clearState()
 	self.wsum = nil
-	self.gradSeq = nil
-	self.gradW = nil
+	self.gradSeq:resize(0)
+	self.gradW:resize(0)
 end

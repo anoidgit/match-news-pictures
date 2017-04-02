@@ -17,9 +17,3 @@ function keepBatch:updateGradInput(input, gradOutput)
 	end
 	return self.gradInput
 end
-
-function keepBatch:clearState()
-	self.output = nil
-	self.gradInput = nil
-	return parent.clearState(self)
-end

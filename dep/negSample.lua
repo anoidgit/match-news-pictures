@@ -27,9 +27,7 @@ function negSample:updateGradInput(input, gradOutput)
 end
 
 function negSample:clearState()
-	self.key=nil
-	self.noise = nil
-	self.output = nil
-	self.gradInput = nil
+	self.key = nil
+	self.noise:resize(0)
 	return parent.clearState(self)
 end

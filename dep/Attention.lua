@@ -60,7 +60,7 @@ end
 
 function Attention:clearState()
 	parent.clearState()
-	self.w = nil
+	self.w:resize(0)
 	self.normw = nil
-	self.gradNormW = nil
+	self.gradNormW:resize(0)
 end
