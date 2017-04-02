@@ -3,8 +3,11 @@
 import sys
 import h5py,numpy
 
+from random import shuffle
+
 def padmat(l2,padv):
 	slen=0
+	rs=[]
 	for lu in l2:
 		tmp=len(lu)
 		if tmp>slen:
@@ -12,9 +15,29 @@ def padmat(l2,padv):
 	for lu in l2:
 		tmp=slen-len(lu)
 		if tmp>0:
-			for i in xrange(tmp):
-				lu.append(padv)
-	return l2
+			tmpl=[padv for i in xrange(tmp)]
+			tmpl.extend(lu)
+			rs.append(tmpl)
+			#lu.extend([padv for i in xrange(tmp)])
+		else:
+			rs.append(lu)
+	return rs
+
+def shufflepair(srcm1, srcm2):
+	bsize=srcm1.shape[0]
+	if bsize == 1:
+		return srcm1, srcm2
+	else:
+		rind = [i for i in xrange(bsize)]
+		shuffle(rind)
+		rsm1 = srcm1.copy()
+		rsm2 = srcm2.copy()
+		curid = 0
+		for ru in rind:
+			rsm1[curid] = srcm1[ru]
+			rsm2[curid] = srcm2[ru]
+			curid+=1
+		return rsm1, rsm2
 
 def handle(srcpf,rspf,srctf,rstf,splf,padv):
 	spf=h5py.File(srcpf,"r")
@@ -32,13 +55,14 @@ def handle(srcpf,rspf,srctf,rstf,splf,padv):
 					for i in xrange(tmp):
 						rp[i]=spf[str(curpid)][:]
 						curpid+=1
-					wrtkey=str(cuwid)
-					rpf[wrtkey]=rp
 					td=[]
 					for i in xrange(tmp):
 						lind=frd.readline().strip().decode("utf-8").split(" ")
 						td.append([int(linu) for linu in lind])
 					td=numpy.array(padmat(td,padv),dtype=long).T
+					rp, td=shufflepair(rp,td)
+					wrtkey=str(cuwid)
+					rpf[wrtkey]=rp
 					rtf[wrtkey]=td
 					cuwid+=1
 	rpf.close()
