@@ -1,8 +1,18 @@
+require "dep.weightSum"
+require "dep.reWShape"
+
+--this was needed for attention neural weight
+require "dep.Attention"
+--this was needed if you use sum vector rather than attention vector
+--require "dep.GlobalSum"
+
 require "nngraph"
 
 function buildseqv(inivec,featsize,pdrop,hsize)
 	local input = nn.vecLookup(inivec)()
-	local weight = nn.reWShape()(nn.Bottle(nn.Linear(inivec:size(2), 1, false))(input))
+	--local weight = nn.reWShape()(nn.Bottle(nn.Linear(inivec:size(2), 1, false))(input))
+	local weight = nn.reWShape()(nn.Bottle(nn.Linear(inivec:size(2) * 2, 1, false))(nn.JoinTable(3)({input, nn.Attention()(input)})))
+	--local weight = nn.reWShape()(nn.Bottle(nn.Linear(inivec:size(2) * 2, 1, false))(nn.JoinTable(3)({input, nn.GlobalSum()(input)})))
 	local output = nn.Linear(inivec:size(2),featsize)(nn.ELU(nil,true)(nn.Dropout(pdrop or 0.5,nil,true)(nn.weightSum()({input, weight}))))
 	return nn.gModule({input}, {output})
 end

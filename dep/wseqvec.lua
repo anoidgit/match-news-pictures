@@ -1,3 +1,5 @@
+require "dep.weightSum"
+
 function buildseqv(inivec,featsize,pdrop)
 	local seqv=nn.Sequential()
 		:add(nn.ParallelTable()

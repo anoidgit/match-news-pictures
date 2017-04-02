@@ -1,6 +1,6 @@
 #!/bin/bash
 
-logfile=170331_0.5l.log
+logfile=170402_0.5lanw.log
 
 logdir=logs
 
