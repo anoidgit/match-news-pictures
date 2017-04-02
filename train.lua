@@ -79,7 +79,10 @@ require "dpnn"
 print("load settings")
 require"aconf"
 
-print("load data")
+require "utils.Logger"
+logger = Logger(logd.."/"..runid..".log", nil, nil, "w")
+
+logger:log("load data")
 require "dloader"
 
 sumErr=0
@@ -95,24 +98,24 @@ function train()
 	local minerrate=starterate
 	local mindeverrate=minerrate
 
-	print("prepare environment")
+	logger:log("prepare environment")
 	require "paths"
 	local savedir="modrs/"..runid.."/"
 	paths.mkdir(savedir)
 
 	local memlimit = recyclemem or 0.05
 
-	print("load optim")
+	logger:log("load optim")
 
 	require "getoptim"
 	local optmethod=getoptim()
 
-	print("design neural networks and criterion")
+	logger:log("design neural networks and criterion")
 
 	require "designn"
 	local nnmod=getnn()
 
-	print(nnmod)
+	logger:log(nnmod)
 	nnmod:training()
 
 	local critmod=getcrit()
@@ -127,13 +130,12 @@ function train()
 	_inner_params, _inner_gradParams=nnmod:getParameters()
 	local savennmod=nn.Serial(nnmod):mediumSerial()
 
-	print("init train")
+	logger:log("init train")
 	local epochs=1
 	local lr=modlr
-	--inirand()
 
-	--mindeverrate=evaDev(nnmod,critmod)
-	--print("Init model Dev:"..mindeverrate)
+	mindeverrate=evaDev(nnmod,critmod)
+	logger:log("Init model Dev:"..mindeverrate)
 	mindeverrate=math.huge--this line was wired, to force forget the init state, added by ano
 
 	local pt = torch.CudaTensor(1):fill(1)
@@ -144,10 +146,10 @@ function train()
 
 	collectgarbage()
 
-	print("start pre train")
+	logger:log("start pre train")
 	for tmpi=1,warmcycle do
 		for tmpj=1,ieps do
-			for i=3000,ntrain do
+			for i=1,ntrain do
 				local it = traint:read(tostring(i)):all():cudaLong()
 				local ip = trainp:read(tostring(i)):all():cuda()
 				local bsize = ip:size(1)
@@ -156,9 +158,8 @@ function train()
 					nt:resize(bsize):fill(-1)
 					dsize=bsize
 				end
-				print("batch:"..i..", size:"..bsize)
 				gradUpdate(nnmod,{it,ip},pt,nt,critmod,lr,optmethod,bsize,nsm,memlimit)
-				--xlua.progress(i, ntrain)
+				xlua.progress(i, ntrain)
 			end
 		end
 		local erate=sumErr/eaddtrain
@@ -166,13 +167,13 @@ function train()
 			minerrate=erate
 		end
 		table.insert(crithis,erate)
-		print("epoch:"..tostring(epochs)..",lr:"..lr..",Tra:"..erate)
+		logger:log("epoch:"..tostring(epochs)..",lr:"..lr..",Tra:"..erate)
 		sumErr=0
 		epochs=epochs+1
 	end
 
 	if warmcycle>0 then
-		print("save neural network trained")
+		logger:log("save neural network trained")
 		savennmod:clearState()
 		saveObject(savedir.."nnmod.asc",savennmod)
 	end
@@ -189,7 +190,7 @@ function train()
 	collectgarbage()
 
 	while cntrun do
-		print("start innercycle:"..icycle)
+		logger:log("start innercycle:"..icycle)
 		for innercycle=1,gtraincycle do
 			for tmpi=1,ieps do
 				for i=1,ntrain do
@@ -209,8 +210,8 @@ function train()
 			table.insert(crithis,erate)
 			local edevrate=evaDev(nnmod,critmod)
 			table.insert(cridev,edevrate)
-			print("epoch:"..tostring(epochs)..",lr:"..lr..",Tra:"..erate..",Dev:"..edevrate)
-			--print("epoch:"..tostring(epochs)..",lr:"..lr..",Tra:"..erate)
+			logger:log("epoch:"..tostring(epochs)..",lr:"..lr..",Tra:"..erate..",Dev:"..edevrate)
+			--logger:log("epoch:"..tostring(epochs)..",lr:"..lr..",Tra:"..erate)
 			local modsavd=false
 			if edevrate<mindeverrate then
 				mindeverrate=edevrate
@@ -223,10 +224,10 @@ function train()
 					storedevmini=1
 				end
 				modsavd=true
-				print("new minimal dev error found, model saved")
+				logger:log("new minimal dev error found, model saved")
 			else
 				if earlystop and amindeverr>earlystop then
-					print("early stop")
+					logger:log("early stop")
 					cntrun=false
 					break
 				end
@@ -242,7 +243,7 @@ function train()
 					if storemini>csave then
 						storemini=1
 					end
-					print("new minimal error found, model saved")
+					logger:log("new minimal error found, model saved")
 				end
 			else
 				if aminerr>=expdecaycycle then
@@ -260,17 +261,17 @@ function train()
 			epochs=epochs+1
 		end
 
-		print("save neural network trained")
+		logger:log("save neural network trained")
 		savennmod:clearState()
 		saveObject(savedir.."nnmod.asc",savennmod)
 
-		print("save criterion history trained")
+		logger:log("save criterion history trained")
 		local critensor=torch.Tensor(crithis)
 		saveObject(savedir.."crit.asc",critensor)
 		local critdev=torch.Tensor(cridev)
 		saveObject(savedir.."critdev.asc",critdev)
 
-		--[[print("plot and save criterion")
+		--[[logger:log("plot and save criterion")
 		gnuplot.plot(critensor)
 		gnuplot.figprint(savedir.."crit.png")
 		gnuplot.figprint(savedir.."crit.eps")
@@ -283,17 +284,18 @@ function train()
 		critensor=nil
 		critdev=nil
 
-		print("task finished!Minimal error rate:"..minerrate.."	"..mindeverrate)
-		--print("task finished!Minimal error rate:"..minerrate)
+		logger:log("task finished!Minimal error rate:"..minerrate.."	"..mindeverrate)
+		--logger:log("task finished!Minimal error rate:"..minerrate)
 
-		print("wait for test, neural network saved at nnmod*.asc")
+		logger:log("wait for test, neural network saved at nnmod*.asc")
 
 		icycle=icycle+1
 
-		print("collect garbage")
+		logger:log("collect garbage")
 		collectgarbage()
 
 	end
 end
 
 train()
+logger:shutDown()

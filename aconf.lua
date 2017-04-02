@@ -9,7 +9,7 @@ gtraincycle=64
 
 modlr=1/8192
 
-earlystop=32
+earlystop=64
 
 csave=3
 
