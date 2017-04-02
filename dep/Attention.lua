@@ -59,8 +59,8 @@ function Attention:updateGradInput(input, gradOutput)
 end
 
 function Attention:clearState()
-	parent.clearState()
 	self.w:resize(0)
 	self.normw = nil
 	self.gradNormW:resize(0)
+	return parent.clearState()
 end

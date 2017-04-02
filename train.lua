@@ -132,8 +132,8 @@ function train()
 	local lr=modlr
 	--inirand()
 
-	mindeverrate=evaDev(nnmod,critmod)
-	print("Init model Dev:"..mindeverrate)
+	--mindeverrate=evaDev(nnmod,critmod)
+	--print("Init model Dev:"..mindeverrate)
 	mindeverrate=math.huge--this line was wired, to force forget the init state, added by ano
 
 	local pt = torch.CudaTensor(1):fill(1)
@@ -147,7 +147,7 @@ function train()
 	print("start pre train")
 	for tmpi=1,warmcycle do
 		for tmpj=1,ieps do
-			for i=1,ntrain do
+			for i=3000,ntrain do
 				local it = traint:read(tostring(i)):all():cudaLong()
 				local ip = trainp:read(tostring(i)):all():cuda()
 				local bsize = ip:size(1)
@@ -156,8 +156,9 @@ function train()
 					nt:resize(bsize):fill(-1)
 					dsize=bsize
 				end
+				print("batch:"..i..", size:"..bsize)
 				gradUpdate(nnmod,{it,ip},pt,nt,critmod,lr,optmethod,bsize,nsm,memlimit)
-				xlua.progress(i, ntrain)
+				--xlua.progress(i, ntrain)
 			end
 		end
 		local erate=sumErr/eaddtrain

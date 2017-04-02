@@ -69,6 +69,7 @@ function vecLookup:updateOutput(input)
 	self:backCompatibility()
 	self:renorm(input)
 	input = self:makeInputContiguous(input)
+	self.weight[self.zgradind]:zero()
 	if input:dim() == 1 then
 		self.output:index(self.weight, 1, input)
 	elseif input:dim() == 2 then
