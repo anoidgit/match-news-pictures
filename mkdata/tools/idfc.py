@@ -14,7 +14,7 @@ def ldsrc(fname):
 				tmp=tmp.decode("utf-8")
 				ind=tmp.find(" ")
 				frq=int(tmp[:ind])
-				if frq>1:
+				if frq>5:
 					wds=tmp[ind+1:]
 					sum+=frq*len(wds.split(" "))
 					rs.append((frq,wds))

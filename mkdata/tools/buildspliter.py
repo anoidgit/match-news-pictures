@@ -77,7 +77,7 @@ def splitter(sld,maxbatch,maxind,maxpad):
 				mlen=lu
 	if cache>0:
 		rs.append(cache)
-	print "Process:",sumlist(rs),"lines,","seg to:",len(rs),"batches"
+	print "Process:",sumlist(rs),"lines, split to:",len(rs),"batches"
 	return rs
 
 def sumlist(lin):
