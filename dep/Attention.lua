@@ -2,10 +2,7 @@ local Attention, parent = torch.class("nn.Attention", "nn.Container")
 
 function Attention:__init()
 	parent.__init(self)
-	self.module = nn.Sequential()
-		:add(nn.Transpose({2,3}))
-		:add(nn.SoftMax())
-		:add(nn.Transpose({2,3}))
+	self.module = nn.SoftMax()
 	self:add(self.module)
 	self.w = torch.Tensor()
 	self.gradNormW = torch.Tensor()
@@ -25,7 +22,8 @@ function Attention:updateOutput(input)
 	for i = 1, seql do
 		self.w[i]:sum(torch.cmul(input[i]:reshape(1, bsize, vsize):expand(isize), input), 3)
 	end
-	self.normw = self.module:updateOutput(self.w)
+	self.w = self.w:transpose(2,3)
+	self.normw = self.module:updateOutput(self.w):transpose(2,3)
 	for i = 1, seql do
 		self.output[i]:sum(torch.cmul(self.normw[i]:reshape(seql, bsize, 1):expand(isize), input), 1)
 	end
@@ -49,7 +47,7 @@ function Attention:updateGradInput(input, gradOutput)
 		self.gradInput:addcmul(curg, self.normw[i]:reshape(seql, bsize, 1):expand(isize))
 		self.gradNormW[i]:sum(torch.cmul(curg, input), 3)
 	end
-	local gradW = self.module:updateGradInput(self.w, self.gradNormW)
+	local gradW = self.module:updateGradInput(self.w, self.gradNormW:transpose(2,3)):transpose(2,3)
 	for i = 1, seql do
 		local curgw = gradW[i]:reshape(seql, bsize, 1):expand(isize)
 		self.gradInput:addcmul(curgw, input[i]:reshape(1, bsize, vsize):expand(isize))
