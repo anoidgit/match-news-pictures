@@ -3,9 +3,11 @@ torch.setdefaulttensortype('torch.FloatTensor')
 
 function checkgpu(limit)
 	local fmem, totalmem = cutorch.getMemoryUsage()
-	if fmem/totalmem < limit then
+	local amem = fmem/totalmem
+	if amem < limit then
 		collectgarbage()
 	end
+	return amem
 end
 
 function feval()
@@ -44,6 +46,7 @@ function evaDev(mlpin, criterionin)
 	local serr=0
 	local pt=torch.CudaTensor(1):fill(1)
 	local dsize=1
+	xlua.progress(0, ndev)
 	for i=1,ndev do
 		local it = devt:read(tostring(i)):all():cudaLong()
 		local ip = devp:read(tostring(i)):all():cuda()
@@ -53,6 +56,7 @@ function evaDev(mlpin, criterionin)
 			dsize=bsize
 		end
 		serr=serr+criterionin:forward(mlpin:forward({it, ip}), pt)
+		xlua.progress(i, ndev)
 	end
 	mlpin:training()
 	return serr/ndev
@@ -149,6 +153,7 @@ function train()
 	logger:log("start pre train")
 	for tmpi=1,warmcycle do
 		for tmpj=1,ieps do
+			xlua.progress(0, ntrain)
 			for i=1,ntrain do
 				local it = traint:read(tostring(i)):all():cudaLong()
 				local ip = trainp:read(tostring(i)):all():cuda()
@@ -193,6 +198,7 @@ function train()
 		logger:log("start innercycle:"..icycle)
 		for innercycle=1,gtraincycle do
 			for tmpi=1,ieps do
+				xlua.progress(0, ntrain)
 				for i=1,ntrain do
 					local it = traint:read(tostring(i)):all():cudaLong()
 					local ip = trainp:read(tostring(i)):all():cuda()

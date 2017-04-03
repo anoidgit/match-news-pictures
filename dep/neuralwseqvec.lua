@@ -13,7 +13,7 @@ function buildseqv(inivec,featsize,pdrop)
 	--local weight = nn.reWShape()(nn.Bottle(nn.Linear(inivec:size(2), 1, false))(input))
 	local weight = nn.reWShape()(nn.Bottle(nn.Linear(inivec:size(2) * 2, 1, false))(nn.JoinTable(3)({input, nn.Attention()(input)})))
 	--local weight = nn.reWShape()(nn.Bottle(nn.Linear(inivec:size(2) * 2, 1, false))(nn.JoinTable(3)({input, nn.GlobalSum()(input)})))
-	local output = nn.Linear(inivec:size(2),featsize)(nn.ELU(nil,true)(nn.Dropout(pdrop or 0.5,nil,true)(nn.weightSum()({input, weight}))))
+	local output = nn.Linear(inivec:size(2),featsize)(nn.ELU(nil,true)(nn.Dropout(pdrop or 0.5,nil,true)(nn.weightSum()({input, nn.ELU(nil,true)(weight)}))))
 	return nn.gModule({input}, {output})
 end
 
