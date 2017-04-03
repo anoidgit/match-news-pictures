@@ -27,11 +27,11 @@ def splitter(sld,maxbatch,maxind,maxpad):
 	mlen=linfo[0]#当前cache的最大长度
 	for lu in linfo:#对于每一个长度的序列
 		#确定实际可用的最大批量值maxbatch_ground
-		curl_maxbatch_ground=min(maxind/lu,maxbatch)#当前长度对应的最大批量
+		curl_maxbatch_ground=max(min(maxind/lu,maxbatch),1)#当前长度对应的最大批量
 		if cache>0:#如果存在cache
 			maxbatch_ground=max(min(maxind/mlen,maxbatch),1)
 		else:
-			maxbatch_ground=max(curl_maxbatch_ground,1)
+			maxbatch_ground=curl_maxbatch_ground
 		ncontent=sld[lu]#获取当前长度序列的数量
 		if ncontent>maxbatch_ground:#如果当前长度大于容许的最大批量大小
 			if cache>0:#如果存在待缓存的剩余内容
@@ -94,7 +94,7 @@ def wrtrs(rsl,fname):
 #src:源文件，按长度降序排列
 #rs:切分配置文件
 def handle(src,rs):
-	maxbatch=32#最大批量大小
+	maxbatch=20#最大批量大小
 	maxind=maxbatch*200#最大词索引数量
 	maxpad=maxbatch/8#最大填充长度
 	wrtrs(splitter(ldsrc(src,100000),maxbatch,maxind,maxpad),rs)
