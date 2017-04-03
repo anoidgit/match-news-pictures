@@ -30,8 +30,8 @@ def shufflepair(srcm1, srcm2):
 	else:
 		rind = [i for i in xrange(bsize)]
 		shuffle(rind)
-		rsm1 = srcm1.copy()
-		rsm2 = srcm2.copy()
+		rsm1 = numpy.zeros(srcm1.shape, dtype=srcm1.dtype)
+		rsm2 = numpy.zeros(srcm2.shape, dtype=srcm2.dtype)
 		curid = 0
 		for ru in rind:
 			rsm1[curid] = srcm1[ru]
