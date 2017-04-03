@@ -59,11 +59,11 @@ def handle(srcpf,rspf,srctf,rstf,splf,padv):
 					for i in xrange(tmp):
 						lind=frd.readline().strip().decode("utf-8").split(" ")
 						td.append([int(linu) for linu in lind])
-					td=numpy.array(padmat(td,padv),dtype=long).T
+					td=numpy.array(padmat(td,padv),dtype=long)
 					rp, td=shufflepair(rp,td)
 					wrtkey=str(cuwid)
 					rpf[wrtkey]=rp
-					rtf[wrtkey]=td
+					rtf[wrtkey]=td.T
 					cuwid+=1
 	rpf.close()
 	rtf.close()
