@@ -2,6 +2,7 @@
 
 --require "dep.wseqvec"
 require "dep.neuralwseqvec"
+--require "dep.neuralgateseqvec"
 
 --require "dep.stdalex"
 require "dep.alex"
