@@ -1,9 +1,8 @@
-local Attention, parent = torch.class("nn.Attention", "nn.Container")
+local Attention, parent = torch.class("nn.Attention", "nn.Module")
 
 function Attention:__init()
 	parent.__init(self)
 	self.module = nn.SoftMax()
-	self:add(self.module)
 	self.w = torch.Tensor()
 	self.gradNormW = torch.Tensor()
 end
@@ -60,5 +59,6 @@ function Attention:clearState()
 	self.w:resize(0)
 	self.normw = nil
 	self.gradNormW:resize(0)
+	self.module.clearState()
 	return parent.clearState()
 end
