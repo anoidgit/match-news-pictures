@@ -9,7 +9,7 @@ gtraincycle=64
 
 modlr=1/8192
 
-earlystop=math.ceil(gtraincycle/2)
+earlystop=gtraincycle
 
 csave=3
 

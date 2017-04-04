@@ -48,8 +48,9 @@ function evaDev(mlpin, criterionin)
 	local dsize=1
 	xlua.progress(0, ndev)
 	for i=1,ndev do
-		local it = devt:read(tostring(i)):all():cudaLong()
-		local ip = devp:read(tostring(i)):all():cuda()
+		local ind = tostring(i)
+		local it = devt:read(ind):all():cudaLong()
+		local ip = devp:read(ind):all():cuda()
 		local bsize = ip:size(1)
 		if bsize~=dsize then
 			pt:resize(bsize):fill(1)
@@ -155,8 +156,9 @@ function train()
 		for tmpj=1,ieps do
 			xlua.progress(0, ntrain)
 			for i=1,ntrain do
-				local it = traint:read(tostring(i)):all():cudaLong()
-				local ip = trainp:read(tostring(i)):all():cuda()
+				local ind = tostring(i)
+				local it = traint:read(ind):all():cudaLong()
+				local ip = trainp:read(ind):all():cuda()
 				local bsize = ip:size(1)
 				if bsize~=dsize then
 					pt:resize(bsize):fill(1)
@@ -200,8 +202,9 @@ function train()
 			for tmpi=1,ieps do
 				xlua.progress(0, ntrain)
 				for i=1,ntrain do
-					local it = traint:read(tostring(i)):all():cudaLong()
-					local ip = trainp:read(tostring(i)):all():cuda()
+					local ind = tostring(i)
+					local it = traint:read(ind):all():cudaLong()
+					local ip = trainp:read(ind):all():cuda()
 					local bsize = ip:size(1)
 					if bsize~=dsize then
 						pt:resize(bsize):fill(1)
